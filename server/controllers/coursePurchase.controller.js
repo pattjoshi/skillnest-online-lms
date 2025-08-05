@@ -6,23 +6,75 @@ import { User } from "../models/user.model.js";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
+// [controllers/courseController.js]
+
+export const checkCouponCode = async (req, res) => {
+  try {
+    const { courseId, couponCode } = req.body;
+
+    const course = await Course.findById(courseId);
+    if (!course) {
+      return res.status(404).json({ message: "Course not found" });
+    }
+
+    if (!course.couponCode) {
+      return res
+        .status(400)
+        .json({ valid: false, message: "No coupon available for this course" });
+    }
+
+    if (course.couponCode.toLowerCase() === couponCode.toLowerCase()) {
+      const originalPrice = course.coursePrice;
+      const discountPrice = course.discountPrice || originalPrice; // fallback if no discount price
+      const discountAmount = originalPrice - discountPrice;
+
+      return res.status(200).json({
+        valid: true,
+        originalPrice,
+        discountPrice,
+        discountAmount,
+        message: "Coupon applied successfully",
+      });
+    } else {
+      return res
+        .status(400)
+        .json({ valid: false, message: "Invalid coupon code" });
+    }
+  } catch (error) {
+    console.error("Error checking coupon code:", error);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+
 export const createCheckoutSession = async (req, res) => {
   try {
     const userId = req.id;
-    const { courseId } = req.body;
+    const { courseId, couponCode } = req.body;
 
     const course = await Course.findById(courseId);
     if (!course) return res.status(404).json({ message: "Course not found!" });
 
-    // Create a new course purchase record
+    let finalPrice = course.coursePrice;
+    const originalPrice = course.coursePrice;
+    const discountPrice = course.discountPrice || originalPrice; // fallback if no discount price
+    const discountAmount = originalPrice - discountPrice;
+
+    // Re-validate coupon code server-side before creating payment session
+    if (
+      couponCode &&
+      course.couponCode &&
+      course.couponCode.toLowerCase() === couponCode.toLowerCase()
+    ) {
+      finalPrice = discountAmount;
+    }
+
     const newPurchase = new CoursePurchase({
       courseId,
       userId,
-      amount: course.coursePrice,
+      amount: finalPrice,
       status: "pending",
     });
 
-    // Create a Stripe checkout session
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       line_items: [
@@ -33,20 +85,20 @@ export const createCheckoutSession = async (req, res) => {
               name: course.courseTitle,
               images: [course.courseThumbnail],
             },
-            unit_amount: course.coursePrice * 100, // Amount in paise (lowest denomination)
+            unit_amount: finalPrice * 100, // in paise
           },
           quantity: 1,
         },
       ],
       mode: "payment",
-      success_url: `http://localhost:5173/course-progress/${courseId}`, // once payment successful redirect to course progress page
+      success_url: `http://localhost:5173/course-progress/${courseId}`,
       cancel_url: `http://localhost:5173/course-detail/${courseId}`,
       metadata: {
         courseId: courseId,
         userId: userId,
       },
       shipping_address_collection: {
-        allowed_countries: ["IN"], // Optionally restrict allowed countries
+        allowed_countries: ["IN"],
       },
     });
 
@@ -56,16 +108,16 @@ export const createCheckoutSession = async (req, res) => {
         .json({ success: false, message: "Error while creating session" });
     }
 
-    // Save the purchase record
     newPurchase.paymentId = session.id;
     await newPurchase.save();
 
     return res.status(200).json({
       success: true,
-      url: session.url, // Return the Stripe checkout URL
+      url: session.url,
     });
   } catch (error) {
-    console.log(error);
+    console.error("Checkout Error:", error);
+    return res.status(500).json({ success: false, message: "Server error" });
   }
 };
 

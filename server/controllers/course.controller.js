@@ -124,6 +124,8 @@ export const editCourse = async (req, res) => {
       category,
       courseLevel,
       coursePrice,
+      couponCode,
+      discountPrice,
     } = req.body;
     const thumbnail = req.file;
 
@@ -142,6 +144,12 @@ export const editCourse = async (req, res) => {
       // upload a thumbnail on clourdinary
       courseThumbnail = await uploadMedia(thumbnail.path);
     }
+    let discountPercent = 0;
+    if (coursePrice && discountPrice && discountPrice < coursePrice) {
+      discountPercent = Math.round(
+        ((coursePrice - discountPrice) / coursePrice) * 100
+      );
+    }
 
     const updateData = {
       courseTitle,
@@ -150,6 +158,9 @@ export const editCourse = async (req, res) => {
       category,
       courseLevel,
       coursePrice,
+      couponCode,
+      discountPrice,
+      discountPercent,
       courseThumbnail: courseThumbnail?.secure_url,
     };
 

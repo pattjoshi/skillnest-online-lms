@@ -1,47 +1,66 @@
-import mongoose from "mongoose"
+import mongoose from "mongoose";
 
-const courseSchema = new mongoose.Schema({
-    courseTitle:{
-        type:String,
-        required:true
+const courseSchema = new mongoose.Schema(
+  {
+    courseTitle: {
+      type: String,
+      required: true,
     },
-    subTitle: {type:String}, 
-    description:{ type:String},
-    category:{
-        type:String,
-        required:true
+    subTitle: { type: String },
+    description: { type: String },
+    category: {
+      type: String,
+      required: true,
     },
-    courseLevel:{
-        type:String,
-        enum:["Beginner", "Medium", "Advance"]
+    courseLevel: {
+      type: String,
+      enum: ["Beginner", "Medium", "Advance"],
     },
-    coursePrice:{
-        type:Number
-    },
-    courseThumbnail:{
-        type:String
-    },
-    enrolledStudents:[
-        {
-            type:mongoose.Schema.Types.ObjectId,
-            ref:'User'
-        }
-    ],
-    lectures:[
-        {
-            type:mongoose.Schema.Types.ObjectId,
-            ref:"Lecture"
-        }
-    ],
-    creator:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:'User'
-    },
-    isPublished:{
-        type:Boolean,
-        default:false
-    }
 
-}, {timestamps:true});
+    // ✅ Original price
+    coursePrice: {
+      type: Number,
+    },
+    // ✅ Discounted price (optional)
+    discountPrice: {
+      type: Number,
+      default: null,
+    },
+
+    // ✅ Coupon code (optional)
+    couponCode: {
+      type: String,
+      default: null,
+    },
+    discountPercent: {
+      type: Number,
+      default: 0,
+    },
+    courseThumbnail: {
+      type: String,
+    },
+    enrolledStudents: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
+    lectures: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Lecture",
+      },
+    ],
+    creator: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+    isPublished: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  { timestamps: true }
+);
 
 export const Course = mongoose.model("Course", courseSchema);

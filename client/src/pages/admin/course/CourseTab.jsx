@@ -37,6 +37,8 @@ const CourseTab = () => {
     courseLevel: "",
     coursePrice: "",
     courseThumbnail: "",
+    couponCode: "",
+    discountPrice: "",
   });
 
   const params = useParams();
@@ -61,6 +63,8 @@ const CourseTab = () => {
         category: course.category,
         courseLevel: course.courseLevel,
         coursePrice: course.coursePrice,
+        couponCode: course.couponCode,
+        discountPrice: course.discountPrice,
         courseThumbnail: "",
       });
       setPreviewThumbnail(course.courseThumbnail);
@@ -101,6 +105,8 @@ const CourseTab = () => {
     formData.append("category", input.category);
     formData.append("courseLevel", input.courseLevel);
     formData.append("coursePrice", input.coursePrice);
+    formData.append("couponCode", input.couponCode);
+    formData.append("discountPrice", input.discountPrice);
     formData.append("courseThumbnail", input.courseThumbnail);
 
     await editCourse({ formData, courseId });
@@ -232,13 +238,35 @@ const CourseTab = () => {
               </Select>
             </div>
             <div>
-              <Label>Price in (INR)</Label>
+              <Label>Original Price in (INR)</Label>
               <Input
                 type="number"
                 name="coursePrice"
                 value={input.coursePrice}
                 onChange={changeEventHandler}
                 placeholder="199"
+                className="w-fit"
+              />
+            </div>
+            <div>
+              <Label>Coupon Code</Label>
+              <Input
+                type="text"
+                name="couponCode"
+                value={input.couponCode}
+                onChange={changeEventHandler}
+                placeholder="SAVE20"
+                className="w-fit"
+              />
+            </div>
+            <div>
+              <Label>Discount Price in (INR)</Label>
+              <Input
+                type="number"
+                name="discountPrice"
+                value={input.discountPrice}
+                onChange={changeEventHandler}
+                placeholder="399"
                 className="w-fit"
               />
             </div>

@@ -16,11 +16,28 @@ This document outlines the key features and improvements to be implemented in th
 - [x] **Role-Based Access Control (RBAC)** _(Instructor-specific)_  
        Add permission-based access control to restrict or grant features to specific user roles like Instructor and Student
 
-- [ ] **Coupon / Discount Code System**  
-       Allow Instructor to generate and manage discount codes applicable on course enrollments.
+- [x] **Coupon / Discount Code System**
 
-- [ ] **Discussion Forum / Q&A per Lecture**  
-       Enable students to ask questions and engage in discussions tied to individual lecture content.
+  - [x] Instructor creates coupon and links to course(s)
+  - [x] Student sees course card → sees discounted price + % off
+  - [x] On checkout:
+    - [x] Coupon is validated
+    - [x] Discounted price is calculated
+
+- [ ] **Discussion Forum / Q&A per Lecture**
+
+  - [ ] Students can post questions or comments
+  - [ ] Instructors or other students can reply
+  - [ ] If instructors reply, show an icon/badge
+  - [ ] Rich text input support
+  - [ ] Like / Upvote replies
+  - [ ] Sorting options (e.g., most recent, most liked)
+  - [ ] Polling or refresh button to fetch new replies
+  - [ ] Reply threading (nested replies)
+  - [ ] Pagination or lazy loading of questions
+  - [ ] Markdown or HTML formatting support
+  - [ ] Admin/instructor moderation tools
+  - [ ] Notification system for new replies or mentions
 
 - [ ] **Student → Instructor Messaging**  
        Facilitate direct communication between students and instructors within the platform.

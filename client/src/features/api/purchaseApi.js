@@ -9,11 +9,19 @@ export const purchaseApi = createApi({
     credentials: "include",
   }),
   endpoints: (builder) => ({
+    checkCouponCode: builder.mutation({
+      query: ({ courseId, couponCode }) => ({
+        url: "/checkout/check-coupon",
+        method: "POST",
+        body: { courseId, couponCode },
+      }),
+    }),
+
     createCheckoutSession: builder.mutation({
-      query: (courseId) => ({
+      query: ({ courseId, couponCode }) => ({
         url: "/checkout/create-checkout-session",
         method: "POST",
-        body: { courseId },
+        body: { courseId, couponCode },
       }),
     }),
     getCourseDetailWithStatus: builder.query({
@@ -32,6 +40,7 @@ export const purchaseApi = createApi({
 });
 
 export const {
+  useCheckCouponCodeMutation,
   useCreateCheckoutSessionMutation,
   useGetCourseDetailWithStatusQuery,
   useGetPurchasedCoursesQuery,
